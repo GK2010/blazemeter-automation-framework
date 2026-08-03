@@ -57,7 +57,7 @@ pipeline{
 
         always {
 
-            echo 'Blazemeter automation completed'
+            echo 'Blazemeter Automation completed'
         }
     }
 }
