@@ -1,19 +1,3 @@
-# from scripts.utils import load_config
-# from scripts.auth import BlazeMeterClient
-
-# def main():
-
-#     config = load_config()
-#     client = BlazeMeterClient(config)
-#     user = client.test_connection()
-
-#     if user:
-#         print("\n Logged in as : ")
-#         print(user)
-
-# if __name__ == "__main__":
-#    main()
-
 from scripts.utils import load_config
 from scripts.auth import BlazeMeterClient
 from scripts.discovery import BlazeMeterDiscovery
@@ -22,13 +6,16 @@ from scripts.update_runtime_properties import RuntimePropertyUpdater
 from scripts.multitest_runner import MultiTestRunner
 from scripts.upload_dataset import DatasetUploader
 from scripts.upload_testscripts import TestScriptUploader
+
 from pathlib import Path
 
 import json
 import logging
 import sys
 
+
 config_file = Path("config/config.yaml")
+
 
 if not config_file.exists():
     print(
@@ -38,18 +25,25 @@ if not config_file.exists():
     )
     sys.exit(1)
 
+
 logging.basicConfig(
-    level=logging.INFO
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s"
 )
 
 
 def main():
 
+    # -----------------------------
+    # Load Configuration
+    # -----------------------------
+
     config = load_config()
 
-    #-------------------
+
+    # -----------------------------
     # Authenticate
-    #-------------------
+    # -----------------------------
 
     client = BlazeMeterClient(
         config
@@ -60,12 +54,13 @@ def main():
 
 
     if not user:
-        return
+        print("Authentication failed")
+        sys.exit(1) #this is for jenkins as jenkis need exit code. if running local you can use return and comment this
+        # return
 
 
     print("\nLogged in as:")
     print(user)
-
 
 
     # -----------------------------
@@ -87,17 +82,11 @@ def main():
     )
 
 
-    print("\nDiscovery Result:")
+    print("\nDiscovery completed")
 
-    # print(
-    #     json.dumps(
-    #         result,
-    #         indent=4
-    #     )
-    # )
 
     # -----------------------------
-    # Update Multi Test execution
+    # Update Multi Test Execution
     # Users / Duration / Location
     # -----------------------------
 
@@ -109,11 +98,13 @@ def main():
 
 
     for update in config.get("execution_updates", []):
+
         multitest_name = update["multitest"]
         alias = update["test_alias"]
 
+
         print(
-            f"\nUpdating {alias}"
+            f"\nUpdating execution for {alias}"
         )
 
 
@@ -128,24 +119,23 @@ def main():
                 response,
                 indent=4
             )
-    )
+        )
 
 
     # -----------------------------
-    # Update runTime Properties
+    # Update Runtime Properties
     # -----------------------------
 
     runtime = RuntimePropertyUpdater(
-    client,
-    "config/config.yaml",
-    "logs/discovery.json"
+        client,
+        "config/config.yaml",
+        "logs/discovery.json"
     )
 
 
     for update in config.get("execution_updates", []):
 
         multitest_name = update["multitest"]
-
         alias = update["test_alias"]
 
 
@@ -166,6 +156,7 @@ def main():
                 indent=4
             )
         )
+
 
     # -----------------------------
     # Upload Test Scripts
@@ -250,9 +241,8 @@ def main():
                 indent=4
             )
         )
-    
-    
-    
+
+
     # -----------------------------
     # Start Multi Test
     # -----------------------------
@@ -262,60 +252,55 @@ def main():
     )
 
 
-    # collection_id = result[
-    #     "1x Load Test[DIL] - BFS Client - IMPACT Trades"
-    # ][
-    #     "collection_id"
-    # ]
+    started_tests = set()
+
     for update in config.get("execution_updates", []):
 
-    multitest_name = update["multitest"]
+        multitest_name = update["multitest"]
 
+        if multitest_name in started_tests:
+            continue
 
-    collection_id = result[
-        multitest_name
-    ][
-        "collection_id"
-    ]
-
-
-    print(
-        f"\nStarting Multi Test: {multitest_name}"
-    )
-
-
-    start_response = runner.start(
-        collection_id
-    )
-
-
-    print(
-        "\nStarting Multi Test:"
-    )
-
-    print(
-        collection_id
-    )
-
-
-    start_response = runner.start(
-        collection_id
-    )
-
-
-    print(
-        "\nSTART RESPONSE:"
-    )
-
-    print(
-        json.dumps(
-            start_response,
-            indent=4
+        started_tests.add(
+            multitest_name
         )
-    )
 
+        collection_id = result[
+            multitest_name
+        ][
+            "collection_id"
+        ]
 
+        print(
+            f"\nStarting Multi Test: {multitest_name}"
+        )
 
+        start_response = runner.start(
+            collection_id
+        )
+
+        print(
+            "\nSTART RESPONSE:"
+        )
+
+        print(
+            json.dumps(
+                start_response,
+                indent=4
+            )
+        )
+
+# to run local
+# if __name__ == "__main__":
+
+#     main()
+
+# To run from jenkins use below
 if __name__ == "__main__":
+    try:
+        main()
+        sys.exit(0)
 
-    main()
+    except Exception as e:
+        logging.exception(e)
+        sys.exit(1)

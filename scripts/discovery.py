@@ -67,10 +67,9 @@ Example output:
 
 
 import json
-import yaml
 import logging
 import os
-
+from scripts.utils import load_config
 
 logger = logging.getLogger(__name__)
 
@@ -93,20 +92,6 @@ class BlazeMeterDiscovery:
 
 
 
-    def load_config(self):
-
-        """
-        Load config.yaml
-        """
-
-        with open(
-            self.config_file,
-            "r"
-        ) as file:
-
-            return yaml.safe_load(file)
-
-
 
     def get_collection(
             self,
@@ -122,7 +107,8 @@ class BlazeMeterDiscovery:
         """
 
         url = (
-            f"{self.BASE_URL}/collections/"
+            # f"{self.client.base_url}/collections/"
+            f"{self.client.base_url}/api/v4/collections/"
             f"{collection_id}"
             "?populateTests=true"
         )
@@ -135,14 +121,21 @@ class BlazeMeterDiscovery:
 
 
         response = self.session.get(
-            url
+            url,
+            timeout=30
         )
-
-
+        # logger.info("Response status: %s", response.status_code)
+        # logger.info("Response headers: %s", response.headers)
+        # logger.info("Response body: %s", response.text[:500])
         response.raise_for_status()
 
 
-        data = response.json()
+        try:
+            data = response.json()
+        except ValueError:
+            logger.error("Invalid JSON response from Blazemeter")
+            logger.error(response.text[:500])
+            raise
 
 
         self.save_debug(
@@ -165,7 +158,8 @@ class BlazeMeterDiscovery:
         """
 
         url = (
-            f"{self.BASE_URL}/tests/"
+            # f"{self.BASE_URL}/tests/"
+            f"{self.client.base_url}/api/v4/tests/"
             f"{test_id}"
         )
 
@@ -175,16 +169,36 @@ class BlazeMeterDiscovery:
             test_id
         )
 
-
-        response = self.session.get(
-            url
+        logger.info(
+            "Test details URL: %s",
+        url
         )
 
+
+        response = self.session.get(
+            url,
+            timeout=30
+        )
+
+        logger.info(
+            "Response content type: %s",
+            response.headers.get("Content-Type")
+        )
+
+        logger.info(
+            "Response body: %s",
+            response.text[:500]
+        )
 
         response.raise_for_status()
 
 
-        data = response.json()
+        try:
+            data = response.json()
+        except ValueError:
+            logger.error("Invalid JSON response from Blazemeter")
+            logger.error(response.text[:500])
+            raise
 
 
         return data
@@ -197,7 +211,7 @@ class BlazeMeterDiscovery:
         Main discovery process.
         """
 
-        config = self.load_config()
+        config = load_config()
 
 
         result = {}

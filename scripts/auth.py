@@ -1,7 +1,8 @@
 import requests
+import logging
 from requests.auth import HTTPBasicAuth
 
-class BlazeMeterClient():
+class BlazeMeterClient:
 
     def __init__(self, config):
         
@@ -24,15 +25,17 @@ class BlazeMeterClient():
 
     def test_connection(self):
         url = f"{self.base_url}/api/v4/user"
-        response = self.session.get(url)
+        try:
+            response = self.session.get(url,timeout=30)
 
-        if response.status_code == 200:
-            print("Successfully authenticated")
-            return response.json()
+            if response.status_code == 200:
+                # print("Successfully authenticated") # this if for running local
+                logging.info("Successfully Authenticated") # used this to run for jenkins logging
+                return response.json()
 
-        else:
-            print("Authentical Failed")
-            print("status:", response.status_code)
-            print(response.text)
-
+            logging.error(f"Authentication Failed. Status: {response.status_code}")
+            logging.error(response.text)
+            return None
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Connection Error: {e}")
             return None
