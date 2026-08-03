@@ -13,14 +13,31 @@ pipeline{
         stage('Install Dependencies') {
 
             steps {
-                bat 'pip install -r requirements.txt'
+
+                script {
+                    if (isUnix()) {
+                        sh 'python3 -m pip install -r requirements.txt'
+                    } else {
+                        bat 'python -m pip install -r requirements.txt'
+                    }
+                }
+                
             }
         }
 
         stage('Execute Blazemeter Automation') {
 
             steps {
-                bat 'python main.py'
+
+                script {
+
+                    if (isUnix()) {
+                        sh 'python3 main.py'
+                    } else {
+                        bat 'python main.py'
+                    }
+                }
+                
             }
         }
 
