@@ -68,8 +68,6 @@ logger = logging.getLogger(__name__)
 class ExecutionUpdater:
 
 
-    BASE_URL = "https://a.blazemeter.com/api/v4"
-
 
     def __init__(
             self,
@@ -359,7 +357,7 @@ class ExecutionUpdater:
 
         url = (
 
-            f"{self.BASE_URL}/collections/"
+            f"{self.client.base_url}/api/v4/collections/"
             f"{collection_id}"
             "/override-tests-executions"
             "?populateTests=true"
@@ -385,19 +383,27 @@ class ExecutionUpdater:
 
         response = self.session.put(
             url,
-            json=payload
+            json=payload,
+            timeout=30
         )
 
 
-        print("\nPUT STATUS:")
-        print(response.status_code)
+        logger.info("PUT status: %s", response.status_code)
+        logger.info("PUT response: %s", response.text[:500])
+        # print("\nPUT STATUS:")
+        # print(response.status_code)
 
 
-        print("\nPUT RESPONSE:")
-        print(response.text)
+        # print("\nPUT RESPONSE:")
+        # print(response.text)
 
 
         response.raise_for_status()
 
 
-        return response.json()
+        try:
+            return response.json()
+        except ValueError:
+            logger.error("Invalid JSON Response")
+            logger.error(response.text[:500])
+            raise
