@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan">
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+    </TestPlan>
+    <hashTree>
+      <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="PROPERTY_FILE" elementType="Argument">
+            <stringProp name="Argument.name">PROPERTY_FILE</stringProp>
+            <stringProp name="Argument.value">D:\Users\VinnamalaG\OneDrive - Broadridge Financial Solutions, Inc\Documents\Broadridge\JMeter_Scripts\Blazemeter\uat.properties</stringProp>
+            <stringProp name="Argument.desc"></stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+        </collectionProp>
+      </Arguments>
+      <hashTree/>
+      <CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="HTTP Cookie Manager" enabled="true">
+        <collectionProp name="CookieManager.cookies"/>
+        <boolProp name="CookieManager.clearEachIteration">true</boolProp>
+        <boolProp name="CookieManager.controlledByThreadGroup">false</boolProp>
+      </CookieManager>
+      <hashTree/>
+      <CacheManager guiclass="CacheManagerGui" testclass="CacheManager" testname="HTTP Cache Manager" enabled="true">
+        <boolProp name="clearEachIteration">true</boolProp>
+        <boolProp name="useExpires">true</boolProp>
+        <boolProp name="CacheManager.controlledByThread">false</boolProp>
+      </CacheManager>
+      <hashTree/>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Cancel Trades - JEF - Impact" enabled="true">
+        <intProp name="ThreadGroup.num_threads">1</intProp>
+        <intProp name="ThreadGroup.ramp_time">1</intProp>
+        <stringProp name="ThreadGroup.duration">${__P(TEST_DURATION)}</stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
+          <intProp name="LoopController.loops">-1</intProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="POST_AUTH_TOKEN" enabled="true">
+          <boolProp name="TransactionController.parent">true</boolProp>
+          <boolProp name="TransactionController.includeTimers">false</boolProp>
+        </TransactionController>
+        <hashTree>
+          <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Properties Loader" enabled="true">
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="script">def propsFilePath = vars.get(&quot;PROPERTY_FILE&quot;)
+
+// Define the fallback path (uat.properties) in case the local file is not found
+def fallbackPath = &apos;uat.properties&apos;
+
+
+// Check if the file exists at the path provided in the User Defined Variables
+def propsFile = new File(propsFilePath)
+
+if (propsFile.exists()) {
+    log.info(&quot;Using local properties file: &quot; + propsFilePath)
+} else {
+    log.warn(&quot;Local properties file not found at: &quot; + propsFilePath + &quot;. Falling back to: &quot; + fallbackPath)
+    // Fallback to the default relative path if local file not found
+    propsFile = new File(fallbackPath)
+}
+
+if (propsFile.exists()) {
+    def props = new Properties()
+    propsFile.withInputStream { stream -&gt; props.load(stream) }
+    
+    // Add loaded properties to JMeter context
+    props.each { key, value -&gt; ctx.getProperties().put(key, value) }
+    
+    log.info(&quot;Properties loaded from: &quot; + propsFile.getAbsolutePath())
+    
+    props.each { key, value -&gt;
+        log.info(&quot;Loaded property: &quot; + key + &quot; = &quot; + value)
+    }
+} else {
+    log.error(&quot;Properties file not found at: &quot; + propsFile.getAbsolutePath())
+}
+</stringProp>
+            <stringProp name="scriptLanguage">groovy</stringProp>
+          </JSR223Sampler>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="AUTH_REQUEST" enabled="true">
+            <stringProp name="HTTPSampler.proxyHost">${__P(PROXY_HOST)}</stringProp>
+            <stringProp name="HTTPSampler.proxyPort">${__P(PROXY_PORT)}</stringProp>
+            <stringProp name="HTTPSampler.domain">${__P(AUTH_HOST)}</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/as/token.oauth2</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">grant_type=client_credentials&amp;client_id=${__P(CLIENT_ID)}&amp;client_secret=${__P(CLIENT_SECRET)}&amp;scope=trade-execution:transaction-trades:trades:write</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Content-Type</stringProp>
+                  <stringProp name="Header.value">application/x-www-form-urlencoded</stringProp>
+                </elementProp>
+              </collectionProp>
+            </HeaderManager>
+            <hashTree/>
+            <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="JSR223 PostProcessor" enabled="true">
+              <stringProp name="scriptLanguage">groovy</stringProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="cacheKey">true</stringProp>
+              <stringProp name="script">import groovy.json.JsonSlurper
+
+// Parse the JSON response
+def response = prev.getResponseDataAsString()
+def jsonSlurper = new JsonSlurper()
+def parsedJson = jsonSlurper.parseText(response)
+
+// Extract the token (adjust the key based on your response structure)
+String token = parsedJson.access_token
+
+// Store the token as a JMeter property, so it is available across thread groups
+props.put(&quot;authToken&quot;, token)
+</stringProp>
+            </JSR223PostProcessor>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <RunTime guiclass="RunTimeGui" testclass="RunTime" testname="Runtime Controller" enabled="true">
+          <stringProp name="RunTime.seconds">3300</stringProp>
+        </RunTime>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="03_IMPACT_Cancel_Trade_JEF_032" enabled="true">
+            <stringProp name="TestPlan.comments">Delivery Mode updated to Null so engine can pick the right delivery mode based on config</stringProp>
+            <stringProp name="HTTPSampler.proxyHost">${__P(PROXY_HOST)}</stringProp>
+            <stringProp name="HTTPSampler.proxyPort">${__P(PROXY_PORT)}</stringProp>
+            <stringProp name="HTTPSampler.domain">${__P(TRADES_HOST)}</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/financial-transactions/trade-execution/v2/transaction-trades/cancel</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+  &quot;clientIdentifier&quot;: &quot;${__P(ImpactClientID, 032)}&quot;,&#xd;
+  &quot;entity&quot;: &quot;JEFF&quot;,&#xd;
+  &quot;origin&quot;: &quot;IMPACT&quot;,&#xd;
+  &quot;accountIdentifierValue&quot;: &quot;${account}&quot;,&#xd;
+  &quot;accountIdentifierType&quot;: &quot;AccountNumber&quot;,&#xd;
+  &quot;category&quot;: &quot;Outright&quot;,&#xd;
+  &quot;transactionType&quot;: &quot;Principal&quot;,&#xd;
+  &quot;status&quot;: &quot;Cancel&quot;,&#xd;
+  &quot;direction&quot;: &quot;Buy&quot;,&#xd;
+  &quot;enteredBy&quot;: &quot;HNMATHO&quot;,&#xd;
+  &quot;prices&quot;: [&#xd;
+    {&#xd;
+      &quot;type&quot;: &quot;ExecutionPrice&quot;,&#xd;
+      &quot;subtype&quot;: &quot;CleanPrice&quot;,&#xd;
+      &quot;value&quot;: ${__Random(10, 500)},&#xd;
+      &quot;currency&quot;: &quot;USD&quot;,&#xd;
+      &quot;notation&quot;: &quot;Price&quot;&#xd;
+    }&#xd;
+  ],&#xd;
+  &quot;fees&quot;: [&#xd;
+   {&#xd;
+      &quot;type&quot;: &quot;TransactionFee&quot;,&#xd;
+      &quot;value&quot;: -456.12,&#xd;
+      &quot;currency&quot;: &quot;USD&quot;,&#xd;
+      &quot;isInclusive&quot;: true,&#xd;
+      &quot;direction&quot;: &quot;Collected&quot;&#xd;
+    },&#xd;
+    {&#xd;
+      &quot;type&quot;: &quot;Commission&quot;,&#xd;
+      &quot;value&quot;: 12000,&#xd;
+      &quot;currency&quot;: &quot;USD&quot;,&#xd;
+      &quot;isInclusive&quot;: true,&#xd;
+      &quot;direction&quot;: &quot;Collected&quot;&#xd;
+    }&#xd;
+  ],&#xd;
+  &quot;instrumentIdentifiers&quot;: [&#xd;
+    {&#xd;
+      &quot;role&quot;: &quot;PrimaryInstrument&quot;,&#xd;
+      &quot;type&quot;: &quot;CUSIP&quot;,&#xd;
+      &quot;value&quot;: &quot;912810QX9&quot;&#xd;
+    }&#xd;
+  ],&#xd;
+  &quot;quantities&quot;: [&#xd;
+    {&#xd;
+      &quot;type&quot;: &quot;TotalOrderQuantity&quot;,&#xd;
+      &quot;value&quot;: 1234567.00,&#xd;
+      &quot;instrumentIdentifierType&quot;: &quot;CUSIP&quot;,&#xd;
+      &quot;instrumentIdentifierValue&quot;: &quot;912810QX9&quot;,&#xd;
+      &quot;unitType&quot;: &quot;Shares&quot;&#xd;
+    }&#xd;
+  ],&#xd;
+  &quot;identifiers&quot;: &#xd;
+    {&#xd;
+      &quot;externalReference&quot;: &quot;${externalReferenceId}&quot;&#xd;
+    }&#xd;
+  ,&#xd;
+  &quot;rates&quot;: [&#xd;
+    {&#xd;
+      &quot;type&quot;: &quot;Factor&quot;,&#xd;
+      &quot;value&quot;: 1&#xd;
+    },&#xd;
+    {&#xd;
+      &quot;type&quot;: &quot;ExchangeRate&quot;,&#xd;
+      &quot;subtype&quot;: &quot;Spot&quot;,&#xd;
+      &quot;fromCurrency&quot;: &quot;USD&quot;,&#xd;
+      &quot;toCurrency&quot;: &quot;USD&quot;,&#xd;
+      &quot;value&quot;: 1,&#xd;
+      &quot;multiplyOrDivide&quot;: &quot;Multiply&quot;&#xd;
+    }&#xd;
+  ],&#xd;
+  &quot;amounts&quot;: [&#xd;
+    {&#xd;
+      &quot;type&quot;: &quot;NetAmount&quot;,&#xd;
+      &quot;value&quot;: 7124.2,&#xd;
+      &quot;currency&quot;: &quot;USD&quot;&#xd;
+    }&#xd;
+  ],&#xd;
+  &quot;partyIdentifiers&quot;: [&#xd;
+    {&#xd;
+      &quot;role&quot;: &quot;Organization&quot;,&#xd;
+      &quot;type&quot;: &quot;Internal&quot;,&#xd;
+      &quot;value&quot;: &quot;032&quot;&#xd;
+    },&#xd;
+    {&#xd;
+      &quot;role&quot;: &quot;TradingAccount&quot;,&#xd;
+      &quot;type&quot;: &quot;Internal&quot;,&#xd;
+      &quot;value&quot;: &quot;CYLD&quot;&#xd;
+    },&#xd;
+    {&#xd;
+      &quot;role&quot;: &quot;CustomerAccount&quot;,&#xd;
+      &quot;type&quot;: &quot;Internal&quot;,&#xd;
+      &quot;value&quot;: &quot;9095&quot;&#xd;
+    }&#xd;
+  ],&#xd;
+  &quot;narratives&quot;: [&#xd;
+    {&#xd;
+      &quot;sequence&quot;: 1,&#xd;
+      &quot;type&quot;: &quot;DeliveryMode&quot;,&#xd;
+      &quot;value&quot;: &quot;&quot;&#xd;
+    },&#xd;
+    {&#xd;
+      &quot;sequence&quot;: 1,&#xd;
+      &quot;type&quot;: &quot;OriginatorOfMessage&quot;,&#xd;
+      &quot;value&quot;: &quot;GCT&quot;&#xd;
+    },&#xd;
+    {&#xd;
+      &quot;type&quot;: &quot;SettlementComment&quot;,&#xd;
+      &quot;sequence&quot;: 1,&#xd;
+      &quot;value&quot;: &quot;354534523&quot;&#xd;
+    },&#xd;
+    {&#xd;
+      &quot;type&quot;: &quot;SettlementComment&quot;,&#xd;
+      &quot;sequence&quot;: 2,&#xd;
+      &quot;value&quot;: &quot;1234&quot;&#xd;
+    },&#xd;
+    {&#xd;
+      &quot;type&quot;: &quot;SettlementComment&quot;,&#xd;
+      &quot;sequence&quot;: 3,&#xd;
+      &quot;value&quot;: &quot;DELIVERY INSTR OVERRIDE 1&quot;&#xd;
+    },&#xd;
+    {&#xd;
+      &quot;type&quot;: &quot;SettlementComment&quot;,&#xd;
+      &quot;sequence&quot;: 4,&#xd;
+      &quot;value&quot;: &quot;DELIVERY INSTR OVERRIDE 2&quot;&#xd;
+    },&#xd;
+    {&#xd;
+      &quot;type&quot;: &quot;SettlementComment&quot;,&#xd;
+      &quot;sequence&quot;: 5,&#xd;
+      &quot;value&quot;: &quot;SPECIAL INSTRUCTIONS 1&quot;&#xd;
+    }&#xd;
+  ],&#xd;
+  &quot;classifications&quot;: [&#xd;
+    {&#xd;
+      &quot;type&quot;: &quot;SettlementTerms&quot;,&#xd;
+      &quot;value&quot;: &quot;DeliveryVsPayment&quot;,&#xd;
+      &quot;sourceValue&quot;: &quot;MT&quot;&#xd;
+    }&#xd;
+  ],&#xd;
+  &quot;flags&quot;: &#xd;
+    {&#xd;
+      &quot;isNonCashPayment&quot;: &quot;false&quot;,&#xd;
+      &quot;isNonInstitutional&quot;: &quot;false&quot;,&#xd;
+      &quot;isSuppressAutoSplitting&quot;: &quot;false&quot;&#xd;
+    }&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 PreProcessor_ForHeaderTimeStamp" enabled="true">
+              <stringProp name="scriptLanguage">groovy</stringProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="cacheKey">true</stringProp>
+              <stringProp name="script">import java.text.SimpleDateFormat
+import java.util.TimeZone
+import java.util.Date
+
+// Create SimpleDateFormat instance for formattedDate (ISO 8601 format)
+SimpleDateFormat sdf_Header = new SimpleDateFormat(&quot;yyyy-MM-dd&apos;T&apos;HH:mm:ss.SSS&apos;Z&apos;&quot;)
+sdf_Header.setTimeZone(TimeZone.getTimeZone(&quot;UTC&quot;))
+String formattedDate = sdf_Header.format(new Date())
+vars.put(&quot;formattedTime&quot;, formattedDate)
+
+// Generate a new UUID for this request
+def traceId = UUID.randomUUID().toString()
+// Store it as a JMeter variable
+vars.put(&quot;Trace-ID&quot;, traceId)
+log.info(&quot;Generated Cancel Trade IMPACT Trace-ID: &quot; + vars.get(&quot;Trace-ID&quot;))</stringProp>
+            </JSR223PreProcessor>
+            <hashTree/>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Client-Number</stringProp>
+                  <stringProp name="Header.value">${__P(ImpactClientID, 032)}</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Trace-Id</stringProp>
+                  <stringProp name="Header.value">${Trace-ID}</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Request-Timestamp</stringProp>
+                  <stringProp name="Header.value">${formattedTime}</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Request-Id</stringProp>
+                  <stringProp name="Header.value">${__UUID()}</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Accept</stringProp>
+                  <stringProp name="Header.value">application/json</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Content-Type</stringProp>
+                  <stringProp name="Header.value">application/json</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Authorization</stringProp>
+                  <stringProp name="Header.value">Bearer ${__P(authToken)}</stringProp>
+                </elementProp>
+              </collectionProp>
+            </HeaderManager>
+            <hashTree/>
+            <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="JSR223 PostProcessor" enabled="true">
+              <stringProp name="scriptLanguage">groovy</stringProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="cacheKey">true</stringProp>
+              <stringProp name="script">import java.io.*
+import java.text.SimpleDateFormat
+
+// === CONFIGURATION ===
+String ScriptName = &quot;ImpactCancelTrade&quot;
+
+// === FETCH VALUES FROM JMeter CONTEXT ===
+String traceId = vars.get(&quot;Trace-ID&quot;) ?: &quot;N/A&quot;
+//String txnID = vars.get(&quot;ExternalRefID&quot;) ?: &quot;N/A&quot;
+String responseCode = prev.getResponseCode() ?: &quot;N/A&quot;
+String externalReferenceId = vars.get(&quot;externalReferenceId&quot;) ?: &quot;N/A&quot; // &lt;-- Replace &apos;InputData&apos; with your CSV variable name
+String threadName = vars.getThreadName()
+String timestamp = new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;).format(new Date())
+
+// === COMPOSE LOG LINE ===
+String logLine = &quot;${timestamp},${threadName},${ScriptName},${traceId},${responseCode},${externalReferenceId}\n&quot;
+
+// === GET OR SET FILE PATH ===
+String filePath = props.get(&quot;transaction.log.file&quot;)
+if (filePath == null) {
+    String uuid = UUID.randomUUID().toString()
+    filePath = &quot;transactions_${uuid}.csv&quot;
+    props.put(&quot;transaction.log.file&quot;, filePath)
+}
+
+// === WRITE TO FILE ===
+new File(filePath).withWriterAppend { writer -&gt;
+    writer.write(logLine)
+}
+</stringProp>
+            </JSR223PostProcessor>
+            <hashTree/>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49588">202</stringProp>
+                <stringProp name="51509">401</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">40</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+            <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="AccountNumber_ExternalRefNumber">
+              <stringProp name="filename">cancelTrade_Impact_AccExtRefNew.csv</stringProp>
+              <stringProp name="fileEncoding"></stringProp>
+              <stringProp name="variableNames">account,externalReferenceId</stringProp>
+              <boolProp name="ignoreFirstLine">true</boolProp>
+              <stringProp name="delimiter">,</stringProp>
+              <boolProp name="quotedData">false</boolProp>
+              <boolProp name="recycle">true</boolProp>
+              <boolProp name="stopThread">false</boolProp>
+              <stringProp name="shareMode">shareMode.all</stringProp>
+            </CSVDataSet>
+            <hashTree/>
+            <ConstantThroughputTimer guiclass="TestBeanGUI" testclass="ConstantThroughputTimer" testname="Constant Throughput Timer" enabled="true">
+              <stringProp name="throughput">${__P(ImpactCancelTradeRPM, 17)}</stringProp>
+              <intProp name="calcMode">0</intProp>
+            </ConstantThroughputTimer>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="false">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

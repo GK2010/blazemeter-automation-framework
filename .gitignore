@@ -1,0 +1,20 @@
+# Secrets / local configuration
+config/config.yaml
+properties/uat.properties
+
+# Python cache
+__pycache__/
+scripts/__pycache__/
+*.pyc
+
+# Logs and generated output
+logs/
+*.log
+
+# Environment files
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,235 @@
+blazemeter:
+
+  base_url: https://a.blazemeter.com
+
+  api_key: YOUR_BLAZEMETER_API_KEY
+
+  api_secret: YOUR_BLAZEMETER_API_SECRET
+
+projects:
+
+  - name: Impact Trades
+
+    multitests:
+
+      - name: 1x Load Test[DIL] - BFS Client - IMPACT Trades
+
+        collection_id: 10506120
+
+        performance_tests:
+
+          - alias: CreateTrade_Impact
+
+            blaze_test_name: 01 - Create Txn Trade - Impact - v5 (Load Logic) - forBFS
+            script: testscripts/01_IMPACT_CreateTransactionTrades_v7.jmx
+            dataset: dataset/create_trade_impact_account_businessdate.csv
+
+            execution:
+
+              users: 15
+              duration: 60
+              ramp_up: 0
+
+              locations:
+
+                - location: us-west1-a
+                  users: 5
+
+                - location: us-east4-a
+                  users: 5
+
+                - location: us-central1-a
+                  users: 5
+
+            runtime_properties:
+
+              ImpactCTradeRPM: 78.5
+              ImpactClientID: "000"
+
+
+          - alias: AmendTrade_Impact
+
+            blaze_test_name: 02 - Amend Txn Trade - Impact - v5 (Load Logic) - for BFS
+            script: testscripts/02_IMPACT_Amend_Trade_JEF_032_v7_forBFS.jmx
+            dataset: dataset/amendTrade_Impact_AccExtRef.csv
+
+            execution:
+
+              users: 8
+              duration: 60
+              ramp_up: 0
+
+              locations:
+
+                - location: us-west1-a
+                  users: 3
+
+                - location: us-east4-a
+                  users: 3
+
+                - location: us-east1-b
+                  users: 2
+
+            runtime_properties:
+
+              ImpactAmendTradeRPM: 20.5
+              ImpactClientID: "000"
+              business_date: 2026-04-27
+
+
+          - alias: CancelTrade_Impact
+
+            blaze_test_name: 03 - Cancel Txn Trade - Impact - v5 (Load Logic) - forBFS
+            script: testscripts/03_IMPACT_Cancel_Trade_JEF_032_v7_forBFS.jmx
+            dataset: dataset/cancelTrade_Impact_AccExtRefNew.csv
+
+            execution:
+
+              users: 2
+              duration: 60
+              ramp_up: 0
+
+              locations:
+
+                - location: us-west1-a
+                  users: 2
+
+            runtime_properties:
+
+              ImpactCancelTradeRPM: 10
+              ImpactClientID: "000"
+
+
+          - alias: ListTrade_Impact
+
+            blaze_test_name: 04 - List Txn Trade - Impact - v5 (Soak Logic)
+            script: testscripts/04_IMPACT_List_Txn_Trade_JEF.jmx
+            dataset: dataset/list_trade_impact.csv
+
+            execution:
+
+              users: 10
+              duration: 60
+              ramp_up: 0
+
+              locations:
+
+                - location: us-east-1
+                  users: 5
+
+                - location: us-east4-a
+                  users: 5
+
+            runtime_properties:
+
+              ImpactListTradeRPM: 166.6
+              ImpactClientID: "032"
+              businessDate: 2026-01-27
+
+
+          - alias: ListBalance_Impact
+
+            blaze_test_name: 05 - List Balances - Impact - v5 (Soak Logic)
+            script: testscripts/05_IMPACT_List_Balances_JEF.jmx
+            dataset: dataset/list_balances_impact.csv
+
+            execution:
+
+              users: 15
+              duration: 60
+              ramp_up: 1
+
+              locations:
+
+                - location: us-east-2
+                  users: 8
+
+                - location: us-east4-a
+                  users: 7
+
+            runtime_properties:
+
+              IMPACTListBalanceRPM: 222.2
+              ImpactClientID: "032"
+              businessDate: 2026-01-27
+
+
+          - alias: ListPosition_Impact
+
+            blaze_test_name: 06 - List Positions  - Impact - v5 (Soak Logic)
+            script: testscripts/06_IMPACT_List_Positions_JEF.jmx
+            dataset: dataset/list_position_impact.csv
+
+            execution:
+              users: 10
+              duration: 60
+              ramp_up: 0
+
+              locations:
+                - location: us-east1-b
+                  users: 5
+                - location: us-east-2
+                  users: 5
+
+            runtime_properties:
+              IMPACT_ListPosition_RPM: 199.9
+              ImpactClientID: "032"
+              businessDate: 2026-01-27
+
+
+          - alias: ListPositionByLedger
+
+            blaze_test_name: List Positions By Ledger - v1 [Soak Logic]
+            script: testscripts/0601_IMPACT_List_Positions_ByLedger.jmx
+            dataset: dataset/LedgerType.csv
+
+            execution:
+
+              users: 6
+              duration: 60
+              ramp_up: 0
+
+              locations:
+
+                - location: us-east1-b
+                  users: 6
+
+            runtime_properties:
+
+              IMPACT_ListPosByLedgerRPM: 222.2
+              ImpactClientID: "032"
+              businessDate: 2026-01-27
+
+blazemeter_locations:
+
+  US East (Virginia): us-east4-a
+
+  US East (South Carolina): us-east1
+
+  US West (Oregon): us-west1
+
+  US Central (Iowa): us-central1-a
+
+  US East (Ohio): us-east4-a
+
+execution_updates:
+  - multitest: 1x Load Test[DIL] - BFS Client - IMPACT Trades
+    test_alias: CreateTrade_Impact
+
+  - multitest: 1x Load Test[DIL] - BFS Client - IMPACT Trades
+    test_alias: AmendTrade_Impact
+
+  - multitest: 1x Load Test[DIL] - BFS Client - IMPACT Trades
+    test_alias: CancelTrade_Impact
+
+  - multitest: 1x Load Test[DIL] - BFS Client - IMPACT Trades
+    test_alias: ListTrade_Impact
+
+  - multitest: 1x Load Test[DIL] - BFS Client - IMPACT Trades
+    test_alias: ListBalance_Impact
+
+  - multitest: 1x Load Test[DIL] - BFS Client - IMPACT Trades
+    test_alias: ListPosition_Impact
+
+  - multitest: 1x Load Test[DIL] - BFS Client - IMPACT Trades
+    test_alias: ListPositionByLedger

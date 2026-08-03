@@ -1,0 +1,62 @@
+# UAT ORG PROPERTIES
+
+AUTH_HOST=tst-oauth.broadridge.com
+CLIENT_ID=<YOUR_CLIENT_ID>
+CLIENT_SECRET=<YOUR_CLIENT_SECRET>
+#PROXY_HOST=10.98.21.23
+#PROXY_PORT=8080
+PROXY_HOST=
+PROXY_PORT=
+#TEST_DURATION=20
+
+####################### HOSTS #######################
+ACCOUNT_HOST=tst-api.broadridge.com
+HOLIDAY_CALENDAR_HOST=tst-api.broadridge.com
+TRANSFERS_HOST=tst-api.broadridge.com
+TRADES_HOST=tst-api.broadridge.com
+PARTY_HOST=tst-api.broadridge.com
+PRICES_HOST=tst-api.broadridge.com
+TAX_HOST=tst-api.broadridge.com
+INSTRUMENT_HOST=tst-api.broadridge.com
+INSTRUMENT_HOST_DIRECT=api-instrument.ftb.uat.prd.bfsaws.net
+DISBURSEMENTS_HOST=tst-api.broadridge.com
+CORP_ACTION_HOST=tst-api.broadridge.com
+POSITION_HOST=tst-api.broadridge.com
+BALANCE_HOST=tst-api.broadridge.com
+MONEYMOVEMENT_HOST=tst-oauth.broadridge.com
+
+####################### USERS #######################
+#ACCOUNT_API_USERS=100
+#TRADES_API_USERS=50
+#TRANSFERS_API_USERS=100
+#HOLIDAY_CALENDAR_API_USERS=50
+#PARTY_API_USERS=50
+#PRICES_API_USERS=5
+#TAX_API_USERS=5
+#INSTRUMENT_API_USERS=5
+#DISBURSEMENTS_API_USERS=100
+#CORP_ACTION_API_USERS=5
+#POSITION_API_USERS=5
+#BALANCE_API_USERS=5
+
+# DEV ORG PROPERTIES
+
+#AUTH_HOST=dev-oauth.msapigw.dev.npd.bfsaws.net
+#CLIENT_ID=a825b9d6-9135-4856-a29b-491f2727de1c
+#CLIENT_SECRET=XyzAVRWrf1zBA6FlXkhf8AugWzKb98hyAgNAjT5PxmT12HYuGUZkvekhmY5IMpAlzORf1a8sfIk9dZNeEHzF4w
+#PROXY_HOST=10.98.21.23
+#PROXY_PORT=8080
+#TEST_DURATION=120
+
+####################### HOSTS #######################
+#ACCOUNT_HOST=dev-api.msapigw.dev.npd.bfsaws.net
+#HOLIDAY_CALENDAR_HOST=dev-api.msapigw.dev.npd.bfsaws.net
+#TRANSFERS_HOST=dev-api.msapigw.dev.npd.bfsaws.net
+#TRADES_HOST=dev-api.msapigw.dev.npd.bfsaws.net
+#PARTY_HOST=dev-api.msapigw.dev.npd.bfsaws.net
+#PRICES_HOST=dev-api.msapigw.dev.npd.bfsaws.net
+#TAX_HOST=dev-api.msapigw.dev.npd.bfsaws.net
+#INSTRUMENT_HOST=dev-api.msapigw.dev.npd.bfsaws.net
+#DISBURSEMENTS_HOST=dev-api.msapigw.dev.npd.bfsaws.net
+#CORP_ACTION_HOST=dev-api.msapigw.dev.npd.bfsaws.net
+#POSITION_HOST=dev-api.msapigw.dev.npd.bfsaws.net
